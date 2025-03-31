@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/ai-dashboard/static/css/main.4971a053.css",
+    "main.js": "/ai-dashboard/static/js/main.040292cb.js",
+    "static/js/453.bba35901.chunk.js": "/ai-dashboard/static/js/453.bba35901.chunk.js",
+    "index.html": "/ai-dashboard/index.html",
+    "main.4971a053.css.map": "/ai-dashboard/static/css/main.4971a053.css.map",
+    "main.040292cb.js.map": "/ai-dashboard/static/js/main.040292cb.js.map",
+    "453.bba35901.chunk.js.map": "/ai-dashboard/static/js/453.bba35901.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4971a053.css",
+    "static/js/main.040292cb.js"
+  ]
+}
