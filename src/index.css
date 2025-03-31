@@ -1086,3 +1086,345 @@ body {
   font-weight: 500;
   color: #6b7280;
 }
+
+/* Add these new styles to your index.css file */
+
+/* Animation for the live data indicator */
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Live data stats */
+.live-data-stats {
+  display: flex;
+  align-items: center;
+}
+
+.events-counter {
+  margin-left: 1rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  background-color: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.events-label {
+  margin-right: 0.5rem;
+}
+
+.events-value {
+  font-weight: 600;
+  color: #4f46e5;
+}
+
+/* Filter controls */
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-right: 0.5rem;
+  white-space: nowrap;
+}
+
+.filter-select {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  color: #1f2937;
+  min-width: 8rem;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Query suggestions */
+.query-examples {
+  margin-top: 1rem;
+}
+
+.query-examples p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.query-suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.query-suggestion {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.query-suggestion:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+/* Make the status indicator pulse */
+.status-indicator-green.pulse {
+  position: relative;
+}
+
+.status-indicator-green.pulse::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #10b981;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Responsive chart adjustments for mobile */
+@media (max-width: 768px) {
+  .chart-container {
+    height: 14rem;
+  }
+  
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-label {
+    margin-bottom: 0.25rem;
+  }
+  
+  .filter-select {
+    width: 100%;
+  }
+}
+/* Add these new styles to your index.css file */
+
+/* Refresh button with animation */
+.refresh-button {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.refresh-button:hover {
+  background-color: #f9fafb;
+}
+
+.refresh-button.refreshing {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.refresh-button.refreshing::before {
+  content: '🔄';
+  display: inline-block;
+  margin-right: 0.25rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Live data stats */
+.live-data-stats {
+  display: flex;
+  align-items: center;
+}
+
+.events-counter {
+  margin-left: 1rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  background-color: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.events-label {
+  margin-right: 0.5rem;
+}
+
+.events-value {
+  font-weight: 600;
+  color: #4f46e5;
+}
+
+/* Update schedule indicator */
+.update-schedule {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.countdown {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+/* User badge in navbar */
+.user-avatar {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+/* Filter controls */
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-right: 0.5rem;
+  white-space: nowrap;
+}
+
+.filter-select {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  color: #1f2937;
+  min-width: 8rem;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Query suggestions */
+.query-examples {
+  margin-top: 1rem;
+}
+
+.query-examples p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.query-suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.query-suggestion {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.query-suggestion:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+/* Responsive chart adjustments for mobile */
+@media (max-width: 768px) {
+  .chart-container {
+    height: 14rem;
+  }
+  
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-label {
+    margin-bottom: 0.25rem;
+  }
+  
+  .filter-select {
+    width: 100%;
+  }
+}

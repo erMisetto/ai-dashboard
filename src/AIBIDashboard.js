@@ -1,36 +1,102 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import './index.css';
 
 const AIBIDashboard = () => {
   const [activeTab, setActiveTab] = useState('tactical');
   const [automationLevel, setAutomationLevel] = useState(3);
+  const [selectedFilters, setSelectedFilters] = useState({
+    timeRange: '24h',
+    productCategory: 'all',
+    competitors: 'all',
+    region: 'all'
+  });
+  const [eventsProcessed, setEventsProcessed] = useState(381487);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [salesData, setSalesData] = useState([
+    { name: '09:00', value: 405000, competitors: 388000 },
+    { name: '10:00', value: 422000, competitors: 410000 },
+    { name: '11:00', value: 580000, competitors: 520000 },
+    { name: '12:00', value: 680000, competitors: 600000 },
+    { name: '13:00', value: 720000, competitors: 680000 },
+    { name: '14:00', value: 780000, competitors: 820000 },
+    { name: '15:00', value: 845000, competitors: 810000 },
+    { name: 'Now', value: 920000, competitors: 875000 },
+  ]);
   
-  // Sample data for the dashboards
-  const salesData = [
-    { name: '9:00', value: 4000, competitors: 3800 },
-    { name: '10:00', value: 4200, competitors: 4100 },
-    { name: '11:00', value: 5800, competitors: 5200 },
-    { name: '12:00', value: 6800, competitors: 6000 },
-    { name: '13:00', value: 7200, competitors: 6800 },
-    { name: '14:00', value: 7800, competitors: 8200 },
-    { name: '15:00', value: 8400, competitors: 8100 },
-    { name: 'Now', value: 9200, competitors: 8700 },
+  const forecastData = [
+    { name: 'Now', value: 920000, forecast: 920000 },
+    { name: '16:00', value: null, forecast: 1010000 },
+    { name: '17:00', value: null, forecast: 1120000 },
+    { name: '18:00', value: null, forecast: 1280000 },
+    { name: '19:00', value: null, forecast: 1360000 },
+    { name: '20:00', value: null, forecast: 1220000 },
+    { name: '21:00', value: null, forecast: 1080000 },
+    { name: '22:00', value: null, forecast: 840000 },
   ];
 
-  const forecastData = [
-    { name: 'Now', value: 9200, forecast: 9200 },
-    { name: '16:00', value: null, forecast: 10100 },
-    { name: '17:00', value: null, forecast: 11200 },
-    { name: '18:00', value: null, forecast: 12800 },
-    { name: '19:00', value: null, forecast: 13600 },
-    { name: '20:00', value: null, forecast: 12200 },
-    { name: '21:00', value: null, forecast: 10800 },
-    { name: '22:00', value: null, forecast: 8400 },
-  ];
+  // Format time as HH:MM:SS
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit',
+      hour12: false 
+    });
+  };
+  
+  // Format date as "Today at HH:MM:SS"
+  const formatDateTime = (date) => {
+    return `Today at ${formatTime(date)}`;
+  };
+
+  // Simulated periodic data refresh (every 30 seconds)
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      handleRefresh();
+    }, 30000); // Update every 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, []);
+
+  // Handle manual data refresh
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    
+    // Small random increment to events processed counter
+    const newEventsCount = eventsProcessed + Math.floor(Math.random() * 800) + 200;
+    
+    // Update the sales data with realistic changes
+    const newSalesData = [...salesData];
+    
+    // Shift time values one step forward (simulating time progression)
+    for (let i = 0; i < newSalesData.length - 1; i++) {
+      newSalesData[i] = { ...newSalesData[i+1], name: newSalesData[i].name };
+    }
+    
+    // Update the last data point with new realistic values that follow the trend
+    const trendFactor = Math.random() * 0.06 + 0.97; // Between 0.97 and 1.03 (slight trend variation)
+    const lastValue = newSalesData[newSalesData.length - 2].value;
+    const lastCompValue = newSalesData[newSalesData.length - 2].competitors;
+    
+    newSalesData[newSalesData.length - 1] = {
+      name: 'Now',
+      value: Math.round(lastValue * trendFactor),
+      competitors: Math.round(lastCompValue * (trendFactor * 0.98 + 0.01)) // Slightly different trend
+    };
+    
+    // Update state after a slight delay to simulate data fetching
+    setTimeout(() => {
+      setSalesData(newSalesData);
+      setEventsProcessed(newEventsCount);
+      setLastUpdated(new Date());
+      setIsRefreshing(false);
+    }, 600);
+  };
 
   const categoryData = [
-    { name: 'Electr', value: 42 },
+    { name: 'Electronics', value: 42 },
     { name: 'Fashion', value: 28 },
     { name: 'Home', value: 15 },
     { name: 'Beauty', value: 10 },
@@ -47,7 +113,8 @@ const AIBIDashboard = () => {
       recommendedPrice: 134.99, 
       reason: 'Competitor price drop detected, 3 competitors now at $139.99', 
       confidence: 92,
-      urgency: 'high'
+      urgency: 'high',
+      category: 'Electronics'
     },
     { 
       id: 2, 
@@ -56,7 +123,8 @@ const AIBIDashboard = () => {
       recommendedPrice: 749.99, 
       reason: 'Trending on social media, demand spiking +218% in last hour', 
       confidence: 87,
-      urgency: 'medium'
+      urgency: 'medium',
+      category: 'Electronics'
     },
     { 
       id: 3, 
@@ -65,7 +133,8 @@ const AIBIDashboard = () => {
       recommendedPrice: 79.99, 
       reason: 'High cart abandonment rate (47%) in last 30 minutes', 
       confidence: 78,
-      urgency: 'medium'
+      urgency: 'medium',
+      category: 'Electronics'
     },
     { 
       id: 4, 
@@ -74,7 +143,28 @@ const AIBIDashboard = () => {
       recommendedPrice: 119.99, 
       reason: 'Similar products trending on Amazon, potential market shift', 
       confidence: 71,
-      urgency: 'low'
+      urgency: 'low',
+      category: 'Electronics'
+    },
+    { 
+      id: 5, 
+      product: 'Designer Handbag - Luxury Collection', 
+      currentPrice: 299.99, 
+      recommendedPrice: 329.99, 
+      reason: 'Celebrity endorsement detected on Instagram, 15% engagement increase', 
+      confidence: 85,
+      urgency: 'medium',
+      category: 'Fashion'
+    },
+    { 
+      id: 6, 
+      product: 'Smart Fitness Watch', 
+      currentPrice: 179.99, 
+      recommendedPrice: 169.99, 
+      reason: 'Competitor launching new model next week, preemptive discount advised', 
+      confidence: 82,
+      urgency: 'medium',
+      category: 'Electronics'
     }
   ];
 
@@ -114,6 +204,27 @@ const AIBIDashboard = () => {
     setAutomationLevel(parseInt(e.target.value));
   };
 
+  // Handle filter changes
+  const handleFilterChange = (filterType, value) => {
+    setSelectedFilters(prevFilters => ({
+      ...prevFilters,
+      [filterType]: value
+    }));
+  };
+
+  // Apply filters to recommendations
+  const filteredRecommendations = pricingRecommendations.filter(rec => {
+    if (selectedFilters.productCategory !== 'all' && rec.category !== selectedFilters.productCategory) {
+      return false;
+    }
+    return true;
+  });
+
+  // Format number with commas
+  const formatNumber = (num) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   return (
     <div className="dashboard">
       {/* Top Navigation */}
@@ -145,10 +256,7 @@ const AIBIDashboard = () => {
               <span className="notification-icon">🔔</span>
             </button>
             <div className="user-avatar">
-              <img
-                src="https://via.placeholder.com/32"
-                alt="User"
-              />
+              <span>User</span>
             </div>
           </div>
         </div>
@@ -164,14 +272,18 @@ const AIBIDashboard = () => {
                activeTab === 'tactical' ? 'Real-Time Dynamic Pricing Dashboard' : 
                'Data Flow Architecture'}
             </h1>
-            <p className="last-updated">Last updated: Today at 15:42:33 (updating in real-time)</p>
+            <p className="last-updated">Last updated: {formatDateTime(lastUpdated)} (updating in real-time)</p>
           </div>
           <div className="header-controls">
             <div className="live-indicator">
               <span className="live-dot"></span>
               <span>Live Data</span>
             </div>
-            <button className="refresh-button">
+            <button 
+              className={`refresh-button ${isRefreshing ? 'refreshing' : ''}`}
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
               🔄 Refresh
             </button>
           </div>
@@ -199,8 +311,13 @@ const AIBIDashboard = () => {
                       >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
+                        <YAxis 
+                          tickFormatter={(value) => value >= 1000000 ? `${(value / 1000000).toFixed(1)}M` : `${(value / 1000).toFixed(0)}K`}
+                          domain={[0, 1600000]}
+                        />
+                        <Tooltip 
+                          formatter={(value) => [`$${formatNumber(value)}`, 'Value']}
+                        />
                         <Legend />
                         <Line type="monotone" dataKey="value" stroke="#8884d8" name="Actual Sales" strokeWidth={2} dot={{ r: 4 }} />
                         <Line type="monotone" dataKey="competitors" stroke="#82ca9d" name="Competitor Avg" strokeWidth={2} />
@@ -212,7 +329,7 @@ const AIBIDashboard = () => {
                 <div className="panel-footer">
                   <div className="ai-insight">
                     <span>AI Insight: </span>
-                    <span>Peak demand forecasted at 19:00 (13,600 units), consider optimizing pricing now</span>
+                    <span>Peak demand forecasted at 19:00 (1,360,000 units), consider optimizing pricing now</span>
                   </div>
                 </div>
               </div>
@@ -386,88 +503,166 @@ const AIBIDashboard = () => {
               ))}
             </div>
 
-            <div className="grid-sales-nlp">
-              {/* Real-Time Sales Tracking */}
-              <div className="panel sales-panel">
-                <div className="panel-header">
-                  <div>
-                    <h3 className="panel-title">Real-Time Sales vs Competitor Pricing</h3>
-                    <p className="panel-subtitle">Live data streaming via Apache Kafka</p>
-                  </div>
+            {/* Filters */}
+            <div className="filters-container">
+              <div className="filter-group">
+                <label className="filter-label">Time Range:</label>
+                <select 
+                  className="filter-select"
+                  value={selectedFilters.timeRange}
+                  onChange={(e) => handleFilterChange('timeRange', e.target.value)}
+                >
+                  <option value="1h">Last Hour</option>
+                  <option value="6h">Last 6 Hours</option>
+                  <option value="24h">Last 24 Hours</option>
+                  <option value="7d">Last 7 Days</option>
+                  <option value="30d">Last 30 Days</option>
+                </select>
+              </div>
+              <div className="filter-group">
+                <label className="filter-label">Product Category:</label>
+                <select 
+                  className="filter-select"
+                  value={selectedFilters.productCategory}
+                  onChange={(e) => handleFilterChange('productCategory', e.target.value)}
+                >
+                  <option value="all">All Categories</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Fashion">Fashion</option>
+                  <option value="Home">Home</option>
+                  <option value="Beauty">Beauty</option>
+                </select>
+              </div>
+              <div className="filter-group">
+                <label className="filter-label">Competitors:</label>
+                <select 
+                  className="filter-select"
+                  value={selectedFilters.competitors}
+                  onChange={(e) => handleFilterChange('competitors', e.target.value)}
+                >
+                  <option value="all">All Competitors</option>
+                  <option value="techgiant">TechGiant Store</option>
+                  <option value="electromarket">ElectroMarket</option>
+                  <option value="supershop">SuperShop</option>
+                </select>
+              </div>
+              <div className="filter-group">
+                <label className="filter-label">Region:</label>
+                <select 
+                  className="filter-select"
+                  value={selectedFilters.region}
+                  onChange={(e) => handleFilterChange('region', e.target.value)}
+                >
+                  <option value="all">All Regions</option>
+                  <option value="north">North America</option>
+                  <option value="europe">Europe</option>
+                  <option value="asia">Asia-Pacific</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Real-Time Sales Tracking */}
+            <div className="panel margined">
+              <div className="panel-header">
+                <div>
+                  <h3 className="panel-title">Real-Time Sales vs Competitor Pricing</h3>
+                  <p className="panel-subtitle">Live data streaming via Apache Kafka</p>
+                </div>
+                <div className="live-data-stats">
                   <div className="live-indicator">
                     <span className="live-dot"></span>
                     <span>Updating live</span>
                   </div>
-                </div>
-                <div className="panel-body">
-                  <div className="chart-container">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={salesData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="value" stroke="#8884d8" name="Our Sales ($)" strokeWidth={2} />
-                        <Line type="monotone" dataKey="competitors" stroke="#82ca9d" name="Competitor Avg ($)" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
+                  <div className="events-counter">
+                    <span className="events-label">Events processed:</span>
+                    <span className="events-value">{formatNumber(eventsProcessed)}</span>
                   </div>
                 </div>
               </div>
-
-              {/* AI Assistant / NLP Query Box */}
-              <div className="panel">
-                <div className="panel-header">
-                  <div>
-                    <h3 className="panel-title">Ask AI Assistant</h3>
-                    <p className="panel-subtitle">Natural language queries powered by NLP</p>
-                  </div>
-                  <span className="badge indigo">NLP</span>
-                </div>
-                <div className="panel-body">
-                  <div className="search-container">
-                    <div className="search-box">
-                      <input
-                        type="text"
-                        className="search-input"
-                        placeholder="Ask a question about your data..."
-                        defaultValue="Which product category is most profitable right now?"
+              <div className="panel-body">
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={salesData}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis 
+                        tickFormatter={(value) => value >= 1000000 ? `${(value / 1000000).toFixed(1)}M` : `${(value / 1000).toFixed(0)}K`}
+                        domain={[300000, 1000000]}
                       />
-                      <div className="search-icon">
-                        💬
-                      </div>
+                      <Tooltip 
+                        formatter={(value) => [`$${formatNumber(value)}`, 'Value']}
+                      />
+                      <Legend />
+                      <Line type="monotone" dataKey="value" stroke="#8884d8" name="Our Sales ($)" strokeWidth={2} />
+                      <Line type="monotone" dataKey="competitors" stroke="#82ca9d" name="Competitor Avg ($)" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div className="panel-footer">
+                <div className="update-schedule">
+                  Next data refresh in <span className="countdown">30s</span>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Assistant / NLP Query Box */}
+            <div className="panel margined">
+              <div className="panel-header">
+                <div>
+                  <h3 className="panel-title">Ask AI Assistant</h3>
+                  <p className="panel-subtitle">Natural language queries powered by NLP</p>
+                </div>
+                <span className="badge indigo">NLP</span>
+              </div>
+              <div className="panel-body">
+                <div className="search-container">
+                  <div className="search-box">
+                    <input
+                      type="text"
+                      className="search-input"
+                      placeholder="Ask a question about your data..."
+                      defaultValue="Which product category is most profitable right now?"
+                    />
+                    <div className="search-icon">
+                      💬
                     </div>
                   </div>
-                  <div className="response-container">
-                    <div className="response-content">
-                      <p className="response-header">Response:</p>
-                      <p>Electronics is currently your most profitable category with a 42% profit margin, followed by Fashion at 28%. Based on real-time sales data, the "Wireless Headphones XB-900" product has the highest individual profit contribution.</p>
-                      <div className="response-chart">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart
-                            data={categoryData}
-                            margin={{ top: 5, right: 0, left: 0, bottom: 5 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="value" name="Profit Margin %" fill="#8884d8">
-                              {categoryData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
+                </div>
+                <div className="response-container">
+                  <div className="response-content">
+                    <p className="response-header">Response:</p>
+                    <p>Electronics is currently your most profitable category with a 42% profit margin, followed by Fashion at 28%. Based on real-time sales data, the "Wireless Headphones XB-900" product has the highest individual profit contribution.</p>
+                    <div className="response-chart">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={categoryData}
+                          margin={{ top: 5, right: 0, left: 0, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="value" name="Profit Margin %" fill="#8884d8">
+                            {categoryData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
-                  <div className="query-examples">
-                    Try asking: "How are competitor prices affecting our conversion rate?" or "Predict sales for the next 4 hours"
+                </div>
+                <div className="query-examples">
+                  <p>Try asking:</p>
+                  <div className="query-suggestion-list">
+                    <button className="query-suggestion">How are competitor prices affecting our conversion rate?</button>
+                    <button className="query-suggestion">Predict sales for the next 4 hours</button>
+                    <button className="query-suggestion">Which products should we consider for a flash sale?</button>
+                    <button className="query-suggestion">What's driving the current trend in the Electronics category?</button>
                   </div>
                 </div>
               </div>
@@ -506,6 +701,7 @@ const AIBIDashboard = () => {
                     <thead>
                       <tr>
                         <th>Product</th>
+                        <th>Category</th>
                         <th>Current Price</th>
                         <th>Recommended</th>
                         <th>Reason</th>
@@ -514,10 +710,13 @@ const AIBIDashboard = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {pricingRecommendations.map((rec) => (
+                      {filteredRecommendations.map((rec) => (
                         <tr key={rec.id} className={rec.urgency === 'high' ? 'row-urgent' : rec.urgency === 'medium' ? 'row-warning' : ''}>
                           <td className="cell-product">
                             {rec.product}
+                          </td>
+                          <td>
+                            {rec.category}
                           </td>
                           <td>
                             ${rec.currentPrice}
@@ -612,7 +811,7 @@ const AIBIDashboard = () => {
                         <div className="process-icon orange">⚡</div>
                         <div className="process-details orange">
                           <p className="process-title">Real-time event streaming</p>
-                          <p className="process-subtitle">Processing 10,000+ events/second</p>
+                          <p className="process-subtitle">Processing {formatNumber(eventsProcessed)} events/second</p>
                           <div className="process-status">
                             <div className="status-indicator-green"></div>
                             Healthy
