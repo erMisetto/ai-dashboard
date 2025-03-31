@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import './index.css';
 
@@ -35,65 +35,6 @@ const AIBIDashboard = () => {
     { name: '21:00', value: null, forecast: 1080000 },
     { name: '22:00', value: null, forecast: 840000 },
   ];
-
-  // Format time as HH:MM:SS
-  const formatTime = (date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      second: '2-digit',
-      hour12: false 
-    });
-  };
-  
-  // Format date as "Today at HH:MM:SS"
-  const formatDateTime = (date) => {
-    return `Today at ${formatTime(date)}`;
-  };
-
-  // Simulated periodic data refresh (every 30 seconds)
-  useEffect(() => {
-    const refreshInterval = setInterval(() => {
-      handleRefresh();
-    }, 30000); // Update every 30 seconds
-    
-    return () => clearInterval(refreshInterval);
-  }, [handleRefresh]);
-
-  // Handle manual data refresh
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    
-    // Small random increment to events processed counter
-    const newEventsCount = eventsProcessed + Math.floor(Math.random() * 800) + 200;
-    
-    // Update the sales data with realistic changes
-    const newSalesData = [...salesData];
-    
-    // Shift time values one step forward (simulating time progression)
-    for (let i = 0; i < newSalesData.length - 1; i++) {
-      newSalesData[i] = { ...newSalesData[i+1], name: newSalesData[i].name };
-    }
-    
-    // Update the last data point with new realistic values that follow the trend
-    const trendFactor = Math.random() * 0.06 + 0.97; // Between 0.97 and 1.03 (slight trend variation)
-    const lastValue = newSalesData[newSalesData.length - 2].value;
-    const lastCompValue = newSalesData[newSalesData.length - 2].competitors;
-    
-    newSalesData[newSalesData.length - 1] = {
-      name: 'Now',
-      value: Math.round(lastValue * trendFactor),
-      competitors: Math.round(lastCompValue * (trendFactor * 0.98 + 0.01)) // Slightly different trend
-    };
-    
-    // Update state after a slight delay to simulate data fetching
-    setTimeout(() => {
-      setSalesData(newSalesData);
-      setEventsProcessed(newEventsCount);
-      setLastUpdated(new Date());
-      setIsRefreshing(false);
-    }, 600);
-  };
 
   const categoryData = [
     { name: 'Electronics', value: 42 },
@@ -198,6 +139,65 @@ const AIBIDashboard = () => {
       color: 'metric-red'
     }
   ];
+
+  // Format time as HH:MM:SS
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit',
+      hour12: false 
+    });
+  };
+  
+  // Format date as "Today at HH:MM:SS"
+  const formatDateTime = (date) => {
+    return `Today at ${formatTime(date)}`;
+  };
+
+  // Define handleRefresh with useCallback BEFORE using it in useEffect
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    
+    // Small random increment to events processed counter
+    const newEventsCount = eventsProcessed + Math.floor(Math.random() * 800) + 200;
+    
+    // Update the sales data with realistic changes
+    const newSalesData = [...salesData];
+    
+    // Shift time values one step forward (simulating time progression)
+    for (let i = 0; i < newSalesData.length - 1; i++) {
+      newSalesData[i] = { ...newSalesData[i+1], name: newSalesData[i].name };
+    }
+    
+    // Update the last data point with new realistic values that follow the trend
+    const trendFactor = Math.random() * 0.06 + 0.97; // Between 0.97 and 1.03 (slight trend variation)
+    const lastValue = newSalesData[newSalesData.length - 2].value;
+    const lastCompValue = newSalesData[newSalesData.length - 2].competitors;
+    
+    newSalesData[newSalesData.length - 1] = {
+      name: 'Now',
+      value: Math.round(lastValue * trendFactor),
+      competitors: Math.round(lastCompValue * (trendFactor * 0.98 + 0.01)) // Slightly different trend
+    };
+    
+    // Update state after a slight delay to simulate data fetching
+    setTimeout(() => {
+      setSalesData(newSalesData);
+      setEventsProcessed(newEventsCount);
+      setLastUpdated(new Date());
+      setIsRefreshing(false);
+    }, 600);
+  }, [eventsProcessed, salesData]);
+
+  // Now use the memoized function in useEffect
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      handleRefresh();
+    }, 30000); // Update every 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [handleRefresh]);
 
   // Toggle for automation level
   const handleAutomationChange = (e) => {
