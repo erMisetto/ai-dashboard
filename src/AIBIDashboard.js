@@ -58,7 +58,7 @@ const AIBIDashboard = () => {
     }, 30000); // Update every 30 seconds
     
     return () => clearInterval(refreshInterval);
-  }, []);
+  }, [handleRefresh]);
 
   // Handle manual data refresh
   const handleRefresh = () => {
